@@ -2,8 +2,15 @@ package rockPaperScissors
 
 class Round(
     private val played: Shape,
-    private val against: Shape
+    private var against: Shape
 ) {
+    constructor(played: Shape, result: Result) : this(played, played) {
+        against = when(result) {
+            Result.Win -> played.defeats()
+            Result.Lose -> played.defeats().defeats()
+            else -> played
+        }
+    }
 
     fun score(): Int {
         return gameScore() + played.value

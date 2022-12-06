@@ -1,16 +1,15 @@
 package rockPaperScissors
 
-import java.lang.reflect.Type
-
 abstract class Shape {
     abstract val value: Int
-    abstract val defeats: Type
+    abstract fun defeats(): Shape
 
     fun vs(shape: Shape): Result {
-        return when (shape::class.java) {
-            this::class.java -> Result.Draw
-            defeats -> Result.Win
+        return when (shape::class) {
+            this::class-> Result.Draw
+            defeats()::class -> Result.Win
             else -> Result.Lose
         }
     }
+
 }
