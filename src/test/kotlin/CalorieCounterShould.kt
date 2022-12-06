@@ -5,42 +5,42 @@ class CalorieCounterShould {
 
     @Test
     fun `return 0 given empty` () {
-        assertEquals(0, count(""))
+        assertEquals(0, top(""))
     }
 
     @Test
     fun `return 1000 given one row of 1000` () {
-        assertEquals(1000, count("1000"))
+        assertEquals(1000, top("1000"))
     }
 
     @Test
     fun `return 3000 given rows 1000, 2000` () {
-        assertEquals(3000, count("1000\n2000"))
+        assertEquals(3000, top("1000\n2000"))
     }
 
     @Test
     fun `return greatest count given two sets` () {
-        assertEquals(4000, count("1000\n2000\n\n4000"))
+        assertEquals(4000, top("1000\n2000\n\n4000"))
     }
 
     @Test
     fun `return greatest count given three sets` () {
-        assertEquals(6000, count("1000\n2000\n\n6000\n\n500\n600"))
+        assertEquals(6000, top("1000\n2000\n\n6000\n\n500\n600"))
+    }
+
+    @Test
+    fun `return the sum of the top two groups given a take greater than one` () {
+        assertEquals(8000, top("500\n500\n\n1000\n1000\n\n6000\n\n500\n600", 2))
     }
 
     @Test
     fun `match the example` () {
-        assertEquals(24000, count(
-            exampleInput.trimIndent()))
+        assertEquals(24000, top(
+            exampleInput.trimIndent()
+        ))
     }
 
-    @Test
-    fun `solve the puzzle` () {
-        assertEquals(24000, count(
-            puzzleInput.trimIndent()))
-    }
-
-    private fun count(list: String) = CalorieCounter().count(list)
+    private fun top(list: String, i: Int = 1) = CalorieCounter().top(list, i)
     
     private val exampleInput = """1000
             2000
