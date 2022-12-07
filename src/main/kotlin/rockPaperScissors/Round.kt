@@ -1,19 +1,25 @@
 package rockPaperScissors
 
 class Round(
-    private val played: Shape,
-    private var against: Shape
+    private var played: Shape,
+    private val against: Shape
 ) {
-    constructor(played: Shape, result: Result) : this(played, played) {
-        against = when(result) {
-            Result.Win -> played.defeats()
-            Result.Lose -> played.defeats().defeats()
+    constructor(against: Shape, result: Result) : this(against, against) {
+        played = when (result) {
+            Result.Win -> defeats(against)
+            Result.Lose -> against.defeats()
             else -> played
         }
     }
 
     fun score(): Int {
         return gameScore() + played.value
+    }
+
+    private fun defeats(played: Shape): Shape {
+        return listOf(Rock(), Paper(), Scissors()).first {
+            it.defeats()::class == played::class
+        }
     }
 
     private fun gameScore() =

@@ -1,6 +1,5 @@
 package rockPaperScissors
 
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
@@ -21,15 +20,11 @@ class GameShould {
         assertEquals(expected, Game().score(round))
     }
 
-//    @Disabled
     @ParameterizedTest(name = "Given result input {0}, scores {1}.")
     @CsvSource(
         "B X, 1",
         "A Y, 4",
-//        "C Z, 6",
-//        "A X, 4",
-//        "C X, 7",
-//        "C Y, 2",
+        "C Z, 7",
     )
     fun `score the round for results`(round: String, expected: Int) {
         assertEquals(expected, Game().scoreFromResults(round))
