@@ -4,11 +4,12 @@ class Round(
     private var played: Shape,
     private val against: Shape
 ) {
+
     constructor(against: Shape, result: Result) : this(against, against) {
         played = when (result) {
             Result.Win -> defeats(against)
             Result.Lose -> against.defeats()
-            else -> played
+            else -> against
         }
     }
 
@@ -16,9 +17,9 @@ class Round(
         return gameScore() + played.value
     }
 
-    private fun defeats(played: Shape): Shape {
+    private fun defeats(against: Shape): Shape {
         return listOf(Rock(), Paper(), Scissors()).first {
-            it.defeats()::class == played::class
+            it.defeats()::class == against::class
         }
     }
 
