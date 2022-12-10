@@ -2,7 +2,11 @@ package assignments
 
 class AssignmentPairs(input: String) {
 
-    fun errorCount() = items.count { !it.isValid() }
+    fun containsCount() = items.count { it.hasContainment() }
+
+    fun overlapCount(): Int {
+        return items.count { it.hasOverlap() }
+    }
 
     private var items: List<AssignmentPair> = parse(input)
 

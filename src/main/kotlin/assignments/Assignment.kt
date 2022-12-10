@@ -1,12 +1,17 @@
 package assignments
 
 class Assignment(input: String) {
-
     val sections: IntRange = parse(input)
 
     fun contains(other: Assignment): Boolean {
         return this.sections.toSet()
             .intersect(other.sections) == other.sections.toSet()
+    }
+
+    fun overlaps(other: Assignment): Boolean {
+        return this.sections.toSet()
+            .intersect(other.sections.toSet())
+            .any()
     }
 
     private fun parse(s: String): IntRange {

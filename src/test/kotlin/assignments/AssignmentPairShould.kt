@@ -1,5 +1,6 @@
 package assignments
 
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -14,19 +15,40 @@ class AssignmentPairShould {
         assertEquals(Assignment("3-4"), pair.second)
     }
 
-    @Test
-    fun `return true given a pair that does not overlap` () {
-        assertTrue(pair("1-3,5 -6").isValid())
+    @Nested
+    inner class `when checking containment` {
+        @Test
+        fun `return false given a pair that does not overlap`() {
+            assertFalse(pair("1-3,5 -6").hasContainment())
+        }
+
+        @Test
+        fun `returns true given a pair where the first contains the second`() {
+            assertTrue(pair("1-5, 2-3").hasContainment())
+        }
+
+        @Test
+        fun `returns true given a pair where the second contains the first`() {
+            assertTrue(pair("12-23, 7-78").hasContainment())
+        }
     }
 
-    @Test
-    fun `returns false given a pair where the first contains the second` () {
-        assertFalse(pair("1-5, 2-3").isValid())
-    }
+    @Nested
+    inner class `when checking overlap` {
+        @Test
+        fun `return false given a pair that does not overlap`() {
+            assertFalse(pair("1-3,5 -6").hasOverlap())
+        }
 
-    @Test
-    fun `returns false given a pair where the second contains the first` () {
-        assertFalse(pair("12-23, 7-78").isValid())
+        @Test
+        fun `returns true given a pair where the first contains the second`() {
+            assertTrue(pair("1-5, 2-3").hasOverlap())
+        }
+
+        @Test
+        fun `returns true given a pair where the second contains the first`() {
+            assertTrue(pair("12-23, 7-78").hasOverlap())
+        }
     }
 
     private fun pair(input: String): AssignmentPair {
