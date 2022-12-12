@@ -7,81 +7,109 @@ import kotlin.test.assertEquals
 
 class SupplyCraneShould {
 
+    private lateinit var crane: CrateMover
+    private lateinit var shipyard: Shipyard
+
     @ParameterizedTest
     @CsvSource(
         "NDP, [N] [D] [P]| 1   2   3 ",
         "ABC, [A] [B] [C]| 1   2   3 ",
     )
-    fun `given a state, gets its top row` (expected:String, input:String) {
-        assertEquals(expected, CrateMover(input.replace("|", "\n")).top())
+    fun `given a state, gets its top row`(expected: String, input: String) {
+        assertEquals(expected, Shipyard(input.replace("|", "\n")).top())
     }
 
     @Test
-    fun `given a two-line state, gets its top elements` () {
-        assertEquals("CAB",
-            CrateMover("    [A] [B]\n[C]        \n 1   2   3 ").top())
+    fun `given a two-line state, gets its top elements`() {
+        assertEquals(
+            "CAB",
+            Shipyard("    [A] [B]\n[C]        \n 1   2   3 ").top()
+        )
     }
 
     @Test
-    fun `moves 1 crate given a command` () {
-        val crane = CrateMover("""    [D]    
+    fun `moves 1 crate given a command`() {
+        arrange(
+            """    [D]    
 [N] [C]    
 [Z] [M] [P]
- 1   2   3 """)
+ 1   2   3 """
+        )
         crane.execute("move 1 from 2 to 1")
-        assertEquals("DCP", crane.top())
+        assertEquals("DCP", shipyard.top())
     }
 
     @Test
-    fun `moves 2 crates given a command` () {
-        val crane = CrateMover("""[D]        
+    fun `moves 2 crates given a command`() {
+        val shipyard = Shipyard(
+            """[D]        
 [N] [C]    
 [Z] [M] [P]
- 1   2   3 """)
+ 1   2   3 """
+        )
+        val crane = CrateMover(shipyard)
         crane.execute("move 2 from 1 to 3")
-        assertEquals("ZCN", crane.top())
+        assertEquals("ZCN", shipyard.top())
     }
 
     @Test
-    fun `moves 3 crates given a command` () {
-        val crane = CrateMover("""[D]        
+    fun `moves 3 crates given a command`() {
+        val shipyard = Shipyard(
+            """[D]        
 [N] [C]    
 [Z] [M] [P]
- 1   2   3 """)
+ 1   2   3 """
+        )
+        val crane = CrateMover(shipyard)
         crane.execute("move 3 from 1 to 3")
-        assertEquals(" CZ", crane.top())
-    }
-    
-    @Test
-    fun `matches the example` () {
-        val crane = CrateMover("""    [D]    
-[N] [C]    
-[Z] [M] [P]
- 1   2   3 """)
-
-        val moves = """move 1 from 2 to 1
-move 3 from 1 to 3
-move 2 from 2 to 1
-move 1 from 1 to 2"""
-
-        crane.execute(moves)
-        assertEquals("CMZ", crane.top())
+        assertEquals(" CZ", shipyard.top())
     }
 
     @Test
-    fun `matches the example for part 2` () {
-        val crane = CrateMover9001("""    [D]    
+    fun `matches the example`() {
+        arrange(
+            """    [D]    
 [N] [C]    
 [Z] [M] [P]
- 1   2   3 """)
+ 1   2   3 """
+        )
 
-        val moves = """move 1 from 2 to 1
+        crane.execute(
+            """move 1 from 2 to 1
 move 3 from 1 to 3
 move 2 from 2 to 1
 move 1 from 1 to 2"""
+        )
 
-        crane.execute(moves)
-        assertEquals("MCD", crane.top())
+        assertEquals("CMZ", shipyard.top())
     }
 
+    @Test
+    fun `matches the example for part 2`() {
+        arrange9001(
+            """    [D]    
+[N] [C]    
+[Z] [M] [P]
+ 1   2   3 """
+        )
+
+        crane.execute(
+            """move 1 from 2 to 1
+move 3 from 1 to 3
+move 2 from 2 to 1
+move 1 from 1 to 2"""
+        )
+
+        assertEquals("MCD", shipyard.top())
+    }
+
+    private fun arrange9001(input: String) {
+        shipyard = Shipyard(input)
+        crane = CrateMover9001(shipyard)
+    }
+
+    private fun arrange(input: String) {
+        shipyard = Shipyard(input)
+        crane = CrateMover(shipyard)
+    }
 }

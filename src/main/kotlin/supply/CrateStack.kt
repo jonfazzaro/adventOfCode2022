@@ -5,8 +5,6 @@ class CrateStack(elements: List<Char>) {
 
     fun top() : Char = items.elementAtOrElse(0) { ' ' }
 
-    fun any(): Boolean = items.any()
-
     fun push(element: Char) = items.add(0, element)
 
     fun pop() : Char = items.removeFirst()
