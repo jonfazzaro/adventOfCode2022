@@ -1,12 +1,12 @@
 package supply
 
-class SupplyCrane(private val state: String) {
+open class CrateMover(private val state: String) {
 
     private val columns = columns()
 
     fun top(): String {
         return columns
-            .map { it.elementAtOrElse(0) { ' ' } }
+            .map { it.top() }
             .joinToString("")
     }
 
@@ -25,10 +25,10 @@ class SupplyCrane(private val state: String) {
         move(command.count, fromColumn, toColumn)
     }
 
-    private fun move(
+    protected open fun move(
         count: Int,
-        fromColumn: MutableList<Char>,
-        toColumn: MutableList<Char>
+        fromColumn: CrateStack,
+        toColumn: CrateStack,
     ) {
         for (i in 0 until count)
             if (fromColumn.any())
@@ -36,25 +36,28 @@ class SupplyCrane(private val state: String) {
     }
 
     private fun move(
-        toColumn: MutableList<Char>,
-        fromColumn: MutableList<Char>
+        toColumn: CrateStack,
+        fromColumn: CrateStack
     ) {
-        toColumn.add(
-            0,
-            fromColumn.removeFirst()
-        )
+        toColumn.push(fromColumn.pop())
     }
 
-    private fun columns(): List<MutableList<Char>> {
-        val lines = state.split("\n").dropLast(1)
-        val width = (lines[0].length + 1) / 4
-        val columnIndexes = IntRange(0, width - 1).map { (it * 4) + 1 }
-        return columnIndexes.map { column(it, lines) }
+    private fun columns(): List<CrateStack> {
+        val lines = lines()
+        return columnIndexes(lines)
+            .map { column(it, lines) }
     }
+
+    private fun columnIndexes(lines: List<String>) =
+        IntRange(0, width(lines) - 1).map { (it * 4) + 1 }
+
+    private fun lines() = state.split("\n").dropLast(1)
+
+    private fun width(lines: List<String>) = (lines[0].length + 1) / 4
 
     private fun column(
         index: Int,
         lines: List<String>
-    ) = lines.map { it[index] }.filter { it != ' ' }.toMutableList()
+    ) = CrateStack(lines.map { it[index] }.filter { it != ' ' })
 
 }
