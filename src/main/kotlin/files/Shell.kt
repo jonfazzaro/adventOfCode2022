@@ -10,12 +10,13 @@ class Shell(var directory: Directory = Directory()) {
         return from.parent?.let { root(it) } ?: from
     }
 
-    fun size(under: Long) : Long {
-        return root().directories()
-            .map { it.size() }
-            .filter { it <= under }
-            .sum()
+    fun size(under: Long): Long {
+        return directoriesUnder(under)
+            .sumOf { it.size() }
     }
+
+    private fun directoriesUnder(sizeLimit: Long) = root().directories()
+        .filter { it.size() <= sizeLimit }
 
     private fun parseLine(it: String) {
         val tokens = it.split(" ")
@@ -47,6 +48,15 @@ class Shell(var directory: Directory = Directory()) {
         }
     }
 
+    fun directoryToDeleteToFreeUp(space: Long): Directory {
+        val unused = TOTAL_DISK_SPACE - root().size()
+        val delta = space - unused
+        return root().directories()
+            .filter { delta <= it.size() }
+            .minByOrNull { it.size() }!!
+    }
+
+    val TOTAL_DISK_SPACE = 70000000
 
 }
 
