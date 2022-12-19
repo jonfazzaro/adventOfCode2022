@@ -1,61 +1,83 @@
 package trees
 
-class Forest(private val input: String) {
+import trees.Direction.*
 
-    val rows: List<List<Int>> = parseRows()
-
-    fun isVisible(row: Int, col: Int): Boolean {
-        return isEdge(row, col)
-                || isVisibleFrom(Direction.North, row, col)
-                || isVisibleFrom(Direction.South, row, col)
-                || isVisibleFrom(Direction.East, row, col)
-                || isVisibleFrom(Direction.West, row, col)
-    }
+class Forest(input: String) {
 
     fun visibleCount(): Int {
-        return (0..lastRow())
-            .sumOf { row ->
-                (0..lastColumn())
-                    .count { col ->
-                        isVisible(row, col)
+        return trees.count { isVisible(it) }
+    }
+
+    fun scenicHighScore(): Int {
+        return trees.maxOf { scenicScore(it) }
+    }
+
+    private fun scenicScore(tree: Tree): Int {
+        return viewToThe(North, tree) *
+                viewToThe(South, tree) *
+                viewToThe(East, tree) *
+                viewToThe(West, tree)
+    }
+
+    private fun isVisible(tree: Tree): Boolean {
+        return isEdge(tree)
+                || isVisibleFromThe(North, tree)
+                || isVisibleFromThe(South, tree)
+                || isVisibleFromThe(East, tree)
+                || isVisibleFromThe(West, tree)
+    }
+
+    private fun isVisibleFromThe(direction: Direction, ofTree: Tree): Boolean {
+        return (treesToThe(direction, ofTree).maxOfOrNull { it.height } ?: 0) < ofTree.height
+    }
+
+    private fun parseTrees(): List<Tree> {
+        return rowIndexes()
+            .flatMap { row ->
+                columnIndexes()
+                    .map { col ->
+                        tree(row, col)
                     }
             }
     }
 
-    private fun isVisibleFrom(direction: Direction, row: Int, col: Int): Boolean {
-        return (treesToThe(direction, row, col).maxOfOrNull { it } ?: 0) < rows[row][col]
+    private fun isEdge(tree: Tree): Boolean {
+        return (tree.row == 0 || tree.row == lastRow())
+                || (tree.col == 0 || tree.col == lastColumn())
     }
 
-    private fun parseRows(): List<List<Int>> {
-        return input.split("\n")
-            .map {
-                it.toCharArray()
-                    .map { c: Char -> c.digitToInt() }
-            }
+    private fun viewToThe(direction: Direction, tree: Tree): Int {
+        val trees = treesToThe(direction, tree)
+        if (isVisibleFromThe(direction, tree))
+            return trees.count()
+        return trees.indexOfFirst { tree.height <= it.height } + 1
     }
 
-    private fun isEdge(row: Int, col: Int): Boolean {
-        return (row == 0 || row == lastRow())
-                || (col == 0 || col == lastColumn())
-    }
-
-    private fun lastColumn() = rows[0].count() - 1
-
-    private fun lastRow() = rows.count() - 1
-
-    private fun treesToThe(direction: Direction, ofRow: Int, ofCol: Int): List<Int> {
+    private fun treesToThe(direction: Direction, ofTree: Tree): List<Tree> {
         return when (direction) {
-            Direction.East -> (ofCol + 1..lastColumn()).map { rows[ofRow][it] }
-            Direction.West -> (0 until ofCol).map { rows[ofRow][it] }
-            Direction.North -> (0 until ofRow).map { rows[it][ofCol] }
-            Direction.South -> (ofRow + 1..lastRow()).map { rows[it][ofCol] }
+            East -> (ofTree.col + 1..lastColumn()).map { tree(ofTree.row, it) }
+            West -> (0 until ofTree.col).reversed().map { tree(ofTree.row, it) }
+            North -> (0 until ofTree.row).reversed().map { tree(it, ofTree.col) }
+            South -> (ofTree.row + 1..lastRow()).map { tree(it, ofTree.col) }
         }
     }
-}
 
-enum class Direction {
-    North,
-    South,
-    East,
-    West
+    private val rows: List<String> = input.split("\n")
+    private val width = rows[0].length
+    private val length = rows.count()
+    private val trees = parseTrees()
+
+    private fun tree(row: Int, col: Int): Tree =
+        Tree(row, col, height(row, col))
+
+    private fun height(row: Int, col: Int) = rows[row][col].digitToInt()
+
+    private fun columnIndexes() = (0..lastColumn())
+
+    private fun rowIndexes() = (0..lastRow())
+
+    private fun lastColumn() = width - 1
+
+    private fun lastRow() = length - 1
+
 }
